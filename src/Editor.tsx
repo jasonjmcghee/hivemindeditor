@@ -25,20 +25,23 @@ export const TextEditor = ({ }: EditorProps) => {
   const { documentName }: any = useLoaderData();
   const { classes: collaborationClasses } = useCollaborationStyles();
 
+  const ydoc = useMemo(() => new Y.Doc(), [documentName]);
+
   const provider = useMemo(
     () =>
       new HocuspocusProvider({
         url: `ws://192.168.5.154:1234/collaboration/${documentName}`,
         name: documentName,
+        document: ydoc
       }),
     [documentName]
   );
 
-  const ydoc = useMemo(() => new Y.Doc(), [documentName]);
-
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        history: false
+      }),
       Link,
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
