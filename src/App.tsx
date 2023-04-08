@@ -1,14 +1,14 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "./App.css";
-import { TextEditor } from "./Editor";
+import {Container, Flex} from "@mantine/core";
 
 import { Outlet } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <Outlet />
-    </div>
+    <Flex>
+      <Container w={"70em"} m={"auto"}>
+        <Outlet />
+      </Container>
+    </Flex>
   );
 }
 
