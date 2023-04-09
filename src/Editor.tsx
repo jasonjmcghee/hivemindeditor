@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import { useMemo } from "react";
+import {useEffect, useMemo} from "react";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
 import {faker} from "@faker-js/faker";
@@ -57,6 +57,12 @@ export const TextEditor = ({ }: EditorProps) => {
       })
     ],
   });
+
+  useEffect(() => {
+    if (editor) {
+      window.editor = editor;
+    }
+  }, [editor]);
 
   return (
     <RichTextEditor editor={editor} className={`${collaborationClasses.collab}`}>
