@@ -32,7 +32,7 @@ export const TextEditor = ({ isPromptInput }: EditorProps) => {
   const provider = useMemo(
     () =>
       new HocuspocusProvider({
-        url: `ws://192.168.5.154:1234/collaboration/${documentName}`,
+        url: `ws://192.168.7.95:1234/collaboration/${documentName}`,
         name: documentName,
         document: ydoc
       }),
@@ -133,7 +133,10 @@ export const TextEditor = ({ isPromptInput }: EditorProps) => {
             method: 'POST',
             body: JSON.stringify({
               "message": editor?.view.state.doc.textContent.trim()
-            })
+            }),
+            headers: {
+              'Content-Type': "application/json"
+            }
           });
           editor?.chain().setContent("").run();
         }}
