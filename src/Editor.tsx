@@ -11,6 +11,7 @@ import * as Y from "yjs";
 import {faker} from "@faker-js/faker";
 
 import { useLoaderData } from "react-router-dom";
+import {Button} from "@mantine/core";
 
 const content =
   '<h2 style="text-align: center;">Welcome to Mantine rich text editor</h2><p><code>RichTextEditor</code> component focuses on usability and is designed to be as simple as possible to bring a familiar editing experience to regular users. <code>RichTextEditor</code> is based on <a href="https://tiptap.dev/" rel="noopener noreferrer" target="_blank">Tiptap.dev</a> and supports all of its features:</p><ul><li>General text formatting: <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strike-through</s> </li><li>Headings (h1-h6)</li><li>Sub and super scripts (<sup>&lt;sup /&gt;</sup> and <sub>&lt;sub /&gt;</sub> tags)</li><li>Ordered and bullet lists</li><li>Text align&nbsp;</li><li>And all <a href="https://tiptap.dev/extensions" target="_blank" rel="noopener noreferrer">other extensions</a></li></ul>';
@@ -19,9 +20,10 @@ const randomName = `${faker.name.fullName()}`;
 const randomColor = faker.color.rgb();
 
 interface EditorProps {
+  isPromptInput: boolean;
 }
 
-export const TextEditor = ({ }: EditorProps) => {
+export const TextEditor = ({ isPromptInput }: EditorProps) => {
   const { documentName }: any = useLoaderData();
   const { classes: collaborationClasses } = useCollaborationStyles();
 
@@ -38,6 +40,11 @@ export const TextEditor = ({ }: EditorProps) => {
   );
 
   const editor = useEditor({
+    ...(
+      isPromptInput
+      ? { content: ""}
+      : {}
+    ),
     extensions: [
       StarterKit.configure({
         history: false
@@ -45,26 +52,38 @@ export const TextEditor = ({ }: EditorProps) => {
       Link,
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Collaboration.configure({
-        document: ydoc,
-      }),
-      CollaborationCursor.configure({
-        provider,
-        user: { name: randomName, color: randomColor },
-      }),
-      Placeholder.configure({
-        placeholder: "Type some text into this editor!"
-      })
+      ...(
+        isPromptInput
+          ? [
+            Placeholder.configure({
+              placeholder: "Send a message..."
+            })
+          ]
+          : [
+          Collaboration.configure({
+            document: ydoc,
+          }),
+          CollaborationCursor.configure({
+            provider,
+            user: { name: randomName, color: randomColor },
+          }),
+          Placeholder.configure({
+            placeholder: "Type some text into this editor!"
+          })
+        ]
+      )
+
     ],
   });
 
   useEffect(() => {
-    if (editor) {
+    if (editor && !isPromptInput) {
       window.editor = editor;
     }
   }, [editor]);
 
   return (
+    <Flex direction={"column"} gap={20}>
     <RichTextEditor editor={editor} className={`${collaborationClasses.collab}`}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
@@ -108,11 +127,23 @@ export const TextEditor = ({ }: EditorProps) => {
 
       <RichTextEditor.Content />
     </RichTextEditor>
+      {isPromptInput && <Button
+        onClick={async () => {
+          await fetch("http://localhost:5555/message", {
+            method: 'POST',
+            body: JSON.stringify({
+              "message": editor?.view.state.doc.textContent.trim()
+            })
+          });
+          editor?.chain().setContent("").run();
+        }}
+      >Ask Question</Button>}
+    </Flex>
   );
 };
 
 
-import { createStyles } from '@mantine/core';
+import {createStyles, Flex} from '@mantine/core';
 import {TextAlign} from "@tiptap/extension-text-align";
 
 const useCollaborationStyles = createStyles((theme) => ({

@@ -48,7 +48,10 @@ const router = createBrowserRouter([
       },
       {
         path: "documents/:documentName",
-        element: <TextEditor/>,
+        element: <Flex direction={"column"} gap={20}>
+          <TextEditor isPromptInput={false} />
+          <TextEditor isPromptInput />
+        </Flex>,
         loader: loader,
       },
     ],
