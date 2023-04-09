@@ -32,6 +32,7 @@ export const TextEditor = ({ isPromptInput }: EditorProps) => {
   const provider = useMemo(
     () =>
       new HocuspocusProvider({
+        // url: `wss://hivemind.fly.dev/collaboration/${documentName}`,
         url: `ws://192.168.7.95:1234/collaboration/${documentName}`,
         name: documentName,
         document: ydoc
@@ -78,7 +79,7 @@ export const TextEditor = ({ isPromptInput }: EditorProps) => {
 
   useEffect(() => {
     if (editor && !isPromptInput) {
-      window.editor = editor;
+      (window as any).editor = editor;
     }
   }, [editor]);
 
